@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="1" author="health-first">
+        <createTable tableName="providers">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_providers"/>
+            </column>
+            <column name="first_name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_providers_email"/>
+            </column>
+            <column name="phone_number" type="varchar(20)"/>
+            <column name="specialization" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="license_number" type="varchar(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_providers_license"/>
+            </column>
+            <column name="is_active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="provider_credentials">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_provider_credentials"/>
+            </column>
+            <column name="provider_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_provider_credentials_provider"
+                             referencedTableName="providers" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="password_hash" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_password_change" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Add indexes -->
+        <createIndex tableName="providers" indexName="idx_providers_email">
+            <column name="email"/>
+        </createIndex>
+        <createIndex tableName="providers" indexName="idx_providers_license">
+            <column name="license_number"/>
+        </createIndex>
+        <createIndex tableName="provider_credentials" indexName="idx_provider_credentials_provider_id">
+            <column name="provider_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

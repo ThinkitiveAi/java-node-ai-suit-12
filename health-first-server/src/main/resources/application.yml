@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: health-first-server
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/health_first_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    
+  # Liquibase Configuration
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+    default-schema: public
+    
+  # Mail Configuration
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME:your-email@gmail.com}
+    password: ${EMAIL_PASSWORD:your-app-specific-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
+          ssl.trust: smtp.gmail.com
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# JWT Configuration
+app:
+  jwt:
+    secret: ${JWT_SECRET:your-256-bit-secret}
+    jwtExpirationMs: 86400000 # 24 hours
+    jwtRefreshExpirationMs: 604800000 # 7 days
+  base-url: http://localhost:8080
+
+# Logging Configuration
+logging:
+  level:
+    org:
+      springframework: INFO
+      hibernate: INFO
+    com.healthfirst: DEBUG
+    
+# Security Configuration
+security:
+  jwt:
+    secret: ${JWT_SECRET:your-256-bit-secret}
+    expiration: 86400000 # 24 hours
+    refreshExpiration: 604800000 # 7 days
