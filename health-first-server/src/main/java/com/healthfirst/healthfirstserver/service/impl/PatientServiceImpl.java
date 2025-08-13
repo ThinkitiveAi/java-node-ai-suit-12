@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -78,9 +79,9 @@ public class PatientServiceImpl implements PatientService {
                 .build();
     }
 
-    private Patient.Address mapAddressRequest(AddressRequest addressRequest) {
+    private com.healthfirst.healthfirstserver.domain.entity.Patient.Address mapAddressRequest(AddressRequest addressRequest) {
         if (addressRequest == null) return null;
-        return Patient.Address.builder()
+        return com.healthfirst.healthfirstserver.domain.entity.Patient.Address.builder()
                 .street(addressRequest.getStreet())
                 .city(addressRequest.getCity())
                 .state(addressRequest.getState())
@@ -88,18 +89,18 @@ public class PatientServiceImpl implements PatientService {
                 .build();
     }
 
-    private Patient.EmergencyContact mapEmergencyContactRequest(EmergencyContactRequest ecRequest) {
+    private com.healthfirst.healthfirstserver.domain.entity.Patient.EmergencyContact mapEmergencyContactRequest(EmergencyContactRequest ecRequest) {
         if (ecRequest == null) return null;
-        return Patient.EmergencyContact.builder()
+        return com.healthfirst.healthfirstserver.domain.entity.Patient.EmergencyContact.builder()
                 .name(ecRequest.getName())
                 .phone(ecRequest.getPhone())
                 .relationship(ecRequest.getRelationship())
                 .build();
     }
 
-    private Patient.InsuranceInfo mapInsuranceInfoRequest(InsuranceInfoRequest iiRequest) {
+    private com.healthfirst.healthfirstserver.domain.entity.Patient.InsuranceInfo mapInsuranceInfoRequest(InsuranceInfoRequest iiRequest) {
         if (iiRequest == null) return null;
-        return Patient.InsuranceInfo.builder()
+        return com.healthfirst.healthfirstserver.domain.entity.Patient.InsuranceInfo.builder()
                 .provider(iiRequest.getProvider())
                 .policyNumber(iiRequest.getPolicyNumber())
                 .build();

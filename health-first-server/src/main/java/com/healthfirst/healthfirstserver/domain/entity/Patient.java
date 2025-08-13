@@ -117,15 +117,14 @@ public class Patient extends BaseEntity {
     public enum Gender {
         MALE, FEMALE, OTHER, PREFER_NOT_TO_SAY
     }
-}
-
-@Embeddable
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-class Address {
+    
+    @Embeddable
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class Address {
     @Column(nullable = false, length = 200)
     private String street;
     
@@ -137,15 +136,15 @@ class Address {
     
     @Column(nullable = false, length = 20)
     private String zip;
-}
+    }
 
-@Embeddable
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-class EmergencyContact {
+    @Embeddable
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class EmergencyContact {
     @Column(length = 100)
     private String name;
     
@@ -154,15 +153,16 @@ class EmergencyContact {
     
     @Column(length = 50)
     private String relationship;
-}
+    }
 
-@Embeddable
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-class InsuranceInfo {
+    @Embeddable
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class InsuranceInfo {
     private String provider;
     private String policyNumber;
+    }
 }

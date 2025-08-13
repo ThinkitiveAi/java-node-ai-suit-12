@@ -14,6 +14,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -33,6 +34,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         
         ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            HttpServletResponse.SC_UNAUTHORIZED,
             "Unauthorized",
             "You need to be authenticated to access this resource"
         );

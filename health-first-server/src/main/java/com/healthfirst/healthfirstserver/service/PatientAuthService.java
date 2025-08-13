@@ -86,7 +86,8 @@ public class PatientAuthService {
             }
 
             // Get user ID from the token
-            UUID userId = tokenProvider.getUserIdFromToken(refreshToken);
+            String userIdStr = tokenProvider.getUserIdFromToken(refreshToken);
+            UUID userId = UUID.fromString(userIdStr);
             
             // Load user details
             Patient patient = patientRepository.findById(userId)

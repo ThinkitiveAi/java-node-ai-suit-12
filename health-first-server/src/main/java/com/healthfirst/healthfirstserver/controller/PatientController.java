@@ -1,7 +1,7 @@
 package com.healthfirst.healthfirstserver.controller;
 
 import com.healthfirst.healthfirstserver.payload.request.patient.PatientRegistrationRequest;
-import com.healthfirst.healthfirstserver.payload.response.ApiResponse;
+// Using fully qualified class name to avoid ambiguity with Swagger's ApiResponse
 import com.healthfirst.healthfirstserver.payload.response.patient.PatientRegistrationResponse;
 import com.healthfirst.healthfirstserver.service.PatientService;
 import com.healthfirst.healthfirstserver.service.VerificationService;
@@ -29,26 +29,25 @@ public class PatientController {
     @PostMapping("/register")
     @Operation(
         summary = "Register a new patient",
-        description = "Registers a new patient with the provided details. Email and phone number must be unique. " +
-                    "A verification email will be sent to the provided email address.",
+        description = "Registers a new patient with the provided details.",
         responses = {
-            @ApiResponse(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "201",
-                description = "Patient registered successfully. Verification email sent.",
-                content = @Content(
+                description = "Patient registered successfully",
+                content = @io.swagger.v3.oas.annotations.media.Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = PatientRegistrationResponse.class)
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = PatientRegistrationResponse.class)
                 )
             ),
-            @ApiResponse(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "400",
                 description = "Invalid input data",
-                content = @Content
+                content = @io.swagger.v3.oas.annotations.media.Content
             ),
-            @ApiResponse(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "409",
                 description = "Email or phone number already registered",
-                content = @Content
+                content = @io.swagger.v3.oas.annotations.media.Content
             )
         }
     )
@@ -59,29 +58,30 @@ public class PatientController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     
-    @GetMapping("/verify-email")
+    @PostMapping("/verify-email")
     @Operation(
-        summary = "Verify email address",
-        description = "Verifies a patient's email address using the verification token sent to their email.",
+        summary = "Verify email",
+        description = "Verifies the user's email using the verification token.",
         responses = {
-            @ApiResponse(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "200",
                 description = "Email verified successfully",
-                content = @Content(
+                content = @io.swagger.v3.oas.annotations.media.Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = ApiResponse.class)
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = com.healthfirst.healthfirstserver.payload.response.ApiResponse.class)
                 )
             ),
-            @ApiResponse(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "400",
                 description = "Invalid or expired token",
-                content = @Content
+                content = @io.swagger.v3.oas.annotations.media.Content
             )
         }
     )
-    public ResponseEntity<ApiResponse> verifyEmail(@RequestParam("token") String token) {
+    public ResponseEntity<com.healthfirst.healthfirstserver.payload.response.ApiResponse> verifyEmail(
+            @RequestParam("token") String token) {
         verificationService.verifyEmail(token);
-        return ResponseEntity.ok(new ApiResponse(true, "Email verified successfully"));
+        return ResponseEntity.ok(new com.healthfirst.healthfirstserver.payload.response.ApiResponse(true, "Email verified successfully"));
     }
     
     @PostMapping("/resend-verification")
@@ -89,30 +89,30 @@ public class PatientController {
         summary = "Resend verification email",
         description = "Resends the verification email to the specified email address.",
         responses = {
-            @ApiResponse(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "200",
                 description = "Verification email resent successfully",
-                content = @Content(
+                content = @io.swagger.v3.oas.annotations.media.Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = ApiResponse.class)
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = com.healthfirst.healthfirstserver.payload.response.ApiResponse.class)
                 )
             ),
-            @ApiResponse(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "400",
                 description = "Email is already verified or invalid",
-                content = @Content
+                content = @io.swagger.v3.oas.annotations.media.Content
             ),
-            @ApiResponse(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "404",
                 description = "No patient found with the provided email",
-                content = @Content
+                content = @io.swagger.v3.oas.annotations.media.Content
             )
         }
     )
-    public ResponseEntity<ApiResponse> resendVerificationEmail(
+    public ResponseEntity<com.healthfirst.healthfirstserver.payload.response.ApiResponse> resendVerificationEmail(
             @RequestParam @Email(message = "Invalid email format") String email) {
         
         verificationService.resendVerificationEmail(email);
-        return ResponseEntity.ok(new ApiResponse(true, "Verification email resent successfully"));
+        return ResponseEntity.ok(new com.healthfirst.healthfirstserver.payload.response.ApiResponse(true, "Verification email resent successfully"));
     }
 }

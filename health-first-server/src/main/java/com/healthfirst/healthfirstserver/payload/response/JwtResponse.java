@@ -13,7 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 public class JwtResponse {
     private String token;
-    private String type = "Bearer";
+    @Builder.Default
+    private String tokenType = "Bearer";
+    private long expiresIn;
     private String id;
     private String email;
     private String fullName;

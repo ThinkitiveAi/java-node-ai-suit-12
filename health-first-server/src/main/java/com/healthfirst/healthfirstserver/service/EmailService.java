@@ -15,18 +15,26 @@ import org.thymeleaf.context.Context;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Locale;
+import java.util.Map;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class EmailService {
 
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
-    @Value("${app.base-url}")
     private final String appBaseUrl;
-    @Value("${spring.mail.username}")
     private final String fromEmail;
+
+    public EmailService(JavaMailSender mailSender, 
+                       TemplateEngine templateEngine,
+                       @Value("${app.base-url:http://localhost:8080}") String appBaseUrl,
+                       @Value("${spring.mail.username}") String fromEmail) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+        this.appBaseUrl = appBaseUrl;
+        this.fromEmail = fromEmail;
+    }
 
     @Async
     public void sendVerificationEmail(Patient patient, String token) {
@@ -73,6 +81,62 @@ public class EmailService {
         } catch (Exception e) {
             log.error("Unexpected error while sending verification email to: {}", 
                 patient.getEmail() != null ? patient.getEmail() : "unknown", e);
+        }
+    }
+    
+    /**
+     * Sends a templated email using Thymeleaf templates
+     * 
+     * @param fromEmail The sender's email address
+     * @param toEmail The recipient's email address
+     * @param subject The email subject
+     * @param templateName The name of the Thymeleaf template (without .html extension)
+     * @param templateVars A map of template variables to be used in the template
+     */
+    @Async
+    public void sendTemplatedEmail(String fromEmail, String toEmail, String subject, 
+                                 String templateName, Map<String, Object> templateVars) {
+        if (toEmail == null || toEmail.trim().isEmpty()) {
+            log.error("Cannot send email: recipient email is null or empty");
+            return;
+        }
+        
+        try {
+            // Prepare the evaluation context
+            final Context ctx = new Context(Locale.getDefault());
+            
+            // Add all template variables to the context
+            if (templateVars != null) {
+                for (Map.Entry<String, Object> entry : templateVars.entrySet()) {
+                    ctx.setVariable(entry.getKey(), entry.getValue());
+                }
+            }
+            
+            // Ensure baseUrl is available in all templates
+            if (!ctx.containsVariable("baseUrl")) {
+                ctx.setVariable("baseUrl", appBaseUrl != null ? appBaseUrl : "http://localhost:8080");
+            }
+            
+            // Create HTML body using Thymeleaf
+            String htmlContent = templateEngine.process(templateName, ctx);
+            
+            // Prepare email
+            final MimeMessage mimeMessage = mailSender.createMimeMessage();
+            final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            
+            message.setSubject(subject);
+            message.setFrom(fromEmail != null ? fromEmail : this.fromEmail);
+            message.setTo(toEmail);
+            message.setText(htmlContent, true); // true = isHtml
+            
+            // Send email
+            mailSender.send(mimeMessage);
+            log.info("Email sent to: {} with template: {}", toEmail, templateName);
+            
+        } catch (MessagingException e) {
+            log.error("Failed to send email to: {}", toEmail, e);
+        } catch (Exception e) {
+            log.error("Unexpected error while sending email to: {}", toEmail, e);
         }
     }
 }

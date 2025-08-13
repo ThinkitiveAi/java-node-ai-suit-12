@@ -9,6 +9,54 @@ import java.time.LocalDate;
 
 @Data
 public class PatientRegistrationRequest {
+    // Explicit getters for fields that are causing compilation errors
+    public String getFirstName() {
+        return firstName;
+    }
+    
+    public String getLastName() {
+        return lastName;
+    }
+    
+    public String getEmail() {
+        return email != null ? email.toLowerCase() : null;
+    }
+    
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+    
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+    
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+    
+    public Gender getGender() {
+        return gender;
+    }
+    
+    public AddressRequest getAddress() {
+        return address;
+    }
+    
+    public EmergencyContactRequest getEmergencyContact() {
+        return emergencyContact;
+    }
+    
+    public String[] getMedicalHistory() {
+        return medicalHistory;
+    }
+    
+    public InsuranceInfoRequest getInsuranceInfo() {
+        return insuranceInfo;
+    }
     
     @NotBlank(message = "First name is required")
     @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")

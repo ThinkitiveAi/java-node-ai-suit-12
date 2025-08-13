@@ -98,7 +98,28 @@ public class JwtTokenProvider {
      * Returns the JWT expiration time in milliseconds
      * @return JWT expiration time in milliseconds
      */
-    public long getJwtExpirationInMs() {
+    public int getJwtExpirationInMs() {
         return jwtExpirationInMs;
+    }
+    
+    /**
+     * Generates a refresh token with a longer expiration time (30 days by default)
+     * @param authentication the authentication object containing user details
+     * @return JWT refresh token
+     */
+    public String generateRefreshToken(Authentication authentication) {
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        Date now = new Date();
+        // Default refresh token expiration: 30 days
+        Date expiryDate = new Date(now.getTime() + (30L * 24 * 60 * 60 * 1000));
+        
+        return Jwts.builder()
+                .setSubject(userPrincipal.getUsername())
+                .setIssuer(jwtIssuer)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .claim("id", userPrincipal.getId())
+                .signWith(getSigningKey())
+                .compact();
     }
 }
