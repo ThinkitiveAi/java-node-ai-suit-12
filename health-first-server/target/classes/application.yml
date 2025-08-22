@@ -33,8 +33,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${EMAIL_USERNAME:your-email@gmail.com}
-    password: ${EMAIL_PASSWORD:your-app-specific-password}
+    username: ${EMAIL_USERNAME:swadheensethy7@gmail.com}
+    password: ${EMAIL_PASSWORD:TEST_PASSWORD}
     properties:
       mail:
         smtp:
@@ -48,8 +48,10 @@ server:
   servlet:
     context-path: /api
 
-# JWT Configuration
+# Application Configuration
 app:
+  email:
+    from: ${EMAIL_USERNAME:swadheensethy7@gmail.com}
   jwt:
     secret: ${JWT_SECRET:your-256-bit-secret}
     jwtExpirationMs: 86400000 # 24 hours

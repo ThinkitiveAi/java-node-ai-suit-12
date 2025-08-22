@@ -3,6 +3,8 @@ package com.healthfirst.healthfirstserver.repository;
 import com.healthfirst.healthfirstserver.domain.entity.Provider;
 import com.healthfirst.healthfirstserver.domain.entity.ProviderAvailability;
 import com.healthfirst.healthfirstserver.domain.enums.AvailabilityStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -50,4 +52,12 @@ public interface ProviderAvailabilityRepository extends JpaRepository<ProviderAv
     List<UUID> findProvidersWithAvailabilityInRange(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+            
+    /**
+     * Find all availabilities for a provider with pagination
+     * @param providerId The ID of the provider
+     * @param pageable Pagination information
+     * @return Page of ProviderAvailability
+     */
+    Page<ProviderAvailability> findByProviderId(UUID providerId, Pageable pageable);
 }

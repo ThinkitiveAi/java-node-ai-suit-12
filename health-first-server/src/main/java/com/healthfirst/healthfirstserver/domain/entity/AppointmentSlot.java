@@ -93,4 +93,22 @@ public class AppointmentSlot extends BaseEntity {
         this.slotStartTime = newStartTime;
         this.slotEndTime = newEndTime;
     }
+    
+    public void setAvailable(boolean available) {
+        if (available) {
+            this.status = AvailabilityStatus.AVAILABLE;
+            this.patient = null;
+            this.bookingReference = null;
+        } else {
+            this.status = AvailabilityStatus.BOOKED;
+        }
+    }
+    
+    public ZonedDateTime getStartTime() {
+        return this.slotStartTime;
+    }
+    
+    public ZonedDateTime getEndTime() {
+        return this.slotEndTime;
+    }
 }

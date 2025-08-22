@@ -81,6 +81,152 @@ public class ProviderAvailability extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> specialRequirements;
 
+    // Setter methods
+    public void setProvider(Provider provider) {
+        this.provider = provider;
+    }
+    
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+    
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+    
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+    
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+    
+    public void setRecurring(boolean recurring) {
+        isRecurring = recurring;
+    }
+    
+    public void setRecurrencePattern(RecurrencePattern recurrencePattern) {
+        this.recurrencePattern = recurrencePattern;
+    }
+    
+    public void setRecurrenceEndDate(LocalDate recurrenceEndDate) {
+        this.recurrenceEndDate = recurrenceEndDate;
+    }
+    
+    public void setSlotDurationMinutes(Integer slotDurationMinutes) {
+        this.slotDurationMinutes = slotDurationMinutes;
+    }
+    
+    public void setBreakDurationMinutes(Integer breakDurationMinutes) {
+        this.breakDurationMinutes = breakDurationMinutes;
+    }
+    
+    public void setStatus(AvailabilityStatus status) {
+        this.status = status;
+    }
+    
+    public void setMaxAppointmentsPerSlot(Integer maxAppointmentsPerSlot) {
+        this.maxAppointmentsPerSlot = maxAppointmentsPerSlot;
+    }
+    
+    public void setCurrentAppointments(Integer currentAppointments) {
+        this.currentAppointments = currentAppointments;
+    }
+    
+    public void setAppointmentType(AppointmentType appointmentType) {
+        this.appointmentType = appointmentType;
+    }
+    
+    public void setLocation(AppointmentLocation location) {
+        this.location = location;
+    }
+    
+    public void setPricing(AppointmentPricing pricing) {
+        this.pricing = pricing;
+    }
+    
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+    
+    public void setSpecialRequirements(List<String> specialRequirements) {
+        this.specialRequirements = specialRequirements;
+    }
+    
+    // Getters for fields that might be needed
+    public Provider getProvider() {
+        return provider;
+    }
+    
+    public LocalDate getDate() {
+        return date;
+    }
+    
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+    
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+    
+    public String getTimezone() {
+        return timezone;
+    }
+    
+    public boolean isRecurring() {
+        return isRecurring;
+    }
+    
+    public RecurrencePattern getRecurrencePattern() {
+        return recurrencePattern;
+    }
+    
+    public LocalDate getRecurrenceEndDate() {
+        return recurrenceEndDate;
+    }
+    
+    public Integer getSlotDurationMinutes() {
+        return slotDurationMinutes;
+    }
+    
+    public Integer getBreakDurationMinutes() {
+        return breakDurationMinutes;
+    }
+    
+    public AvailabilityStatus getStatus() {
+        return status;
+    }
+    
+    public Integer getMaxAppointmentsPerSlot() {
+        return maxAppointmentsPerSlot;
+    }
+    
+    public Integer getCurrentAppointments() {
+        return currentAppointments;
+    }
+    
+    public AppointmentType getAppointmentType() {
+        return appointmentType;
+    }
+    
+    public AppointmentLocation getLocation() {
+        return location;
+    }
+    
+    public AppointmentPricing getPricing() {
+        return pricing;
+    }
+    
+    public String getNotes() {
+        return notes;
+    }
+    
+    public List<String> getSpecialRequirements() {
+        return specialRequirements;
+    }
+    
     // Helper methods
     public boolean isAvailable() {
         return status == AvailabilityStatus.AVAILABLE && 

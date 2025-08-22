@@ -81,7 +81,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
         
         <!-- MapStruct -->
@@ -185,6 +186,9 @@
                     <compilerArgs>
                         <arg>-Amapstruct.defaultComponentModel=spring</arg>
                         <arg>-Alombok.addLombokGeneratedAnnotation=true</arg>
+                        <arg>-XprintProcessorInfo</arg>
+                        <arg>-XprintRounds</arg>
+                        <arg>-verbose</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>

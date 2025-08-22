@@ -48,6 +48,15 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
     List<Appointment> findByProviderId(UUID providerId);
     
     /**
+     * Find all appointments for a specific provider with pagination.
+     *
+     * @param providerId the ID of the provider
+     * @param pageable the pagination information
+     * @return a page of appointments for the provider
+     */
+    Page<Appointment> findByProviderId(UUID providerId, Pageable pageable);
+    
+    /**
      * Find appointments by status.
      *
      * @param status the status to search for
@@ -142,13 +151,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
      * @param limit the maximum number of appointments to return
      * @return a list of upcoming appointments
      */
-    @Query("SELECT a FROM Appointment a " +
-           "WHERE a.patient.id = :patientId " +
-           "AND a.startTime > :now " +
-           "AND a.status NOT IN (com.healthfirst.healthfirstserver.domain.enums.AppointmentStatus.CANCELLED, " +
-           "com.healthfirst.healthfirstserver.domain.enums.AppointmentStatus.COMPLETED, " +
-           "com.healthfirst.healthfirstserver.domain.enums.AppointmentStatus.NO_SHOW) " +
-           "ORDER BY a.startTime ASC")
+    @Query(nativeQuery = true, 
+           value = "SELECT a.* FROM appointments a " +
+                  "WHERE a.patient_id = :patientId " +
+                  "AND a.start_time > :now " +
+                  "AND a.status NOT IN ('CANCELLED', 'COMPLETED', 'NO_SHOW') " +
+                  "ORDER BY a.start_time ASC " +
+                  "LIMIT :limit")
     List<Appointment> findUpcomingAppointments(
             @Param("patientId") Long patientId,
             @Param("now") ZonedDateTime now,

@@ -50,6 +50,16 @@ public interface NotificationService {
     void sendAppointmentCompleted(Appointment appointment);
     
     /**
+     * Send a notification when an appointment is started.
+     * @param appointment The appointment that was started
+     */
+    void sendAppointmentStarted(Appointment appointment);
+    
+    /**
+     * Send a notification when an appointment starts.
+     * @param appointment The appointment that has started
+     */
+    /**
      * Send a notification when a new availability slot is created.
      * @param providerName The name of the provider
      * @param providerEmail The email of the provider

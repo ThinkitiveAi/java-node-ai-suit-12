@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -70,8 +71,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setPatient(patient);
         appointment.setProvider(provider);
         appointment.setAppointmentType(request.getAppointmentType());
-        appointment.setStartTime(slot.getSlotStartTime());
-        appointment.setEndTime(slot.getSlotEndTime());
+        appointment.setStartTime(slot.getStartTime());
+        appointment.setEndTime(slot.getEndTime());
         appointment.setStatus(AppointmentStatus.BOOKED);
         appointment.setReason(request.getReason());
         appointment.setNotes(request.getNotes());
@@ -103,8 +104,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional(readOnly = true)
     public List<AppointmentResponse> getPatientAppointments(String patientId, LocalDate startDate, LocalDate endDate) {
         UUID id = UUID.fromString(patientId);
-        ZonedDateTime start = startDate != null ? startDate.atStartOfDay(timeZoneService.getSystemZoneId()) : null;
-        ZonedDateTime end = endDate != null ? endDate.plusDays(1).atStartOfDay(timeZoneService.getSystemZoneId()) : null;
+        ZonedDateTime start = startDate != null ? startDate.atStartOfDay(ZoneId.systemDefault()) : null;
+        ZonedDateTime end = endDate != null ? endDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()) : null;
         
         List<Appointment> appointments;
         if (start != null && end != null) {
@@ -122,8 +123,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional(readOnly = true)
     public Page<AppointmentResponse> getProviderAppointments(String providerId, LocalDate date, Pageable pageable) {
         UUID id = UUID.fromString(providerId);
-        ZonedDateTime startOfDay = date != null ? date.atStartOfDay(timeZoneService.getSystemZoneId()) : null;
-        ZonedDateTime endOfDay = date != null ? date.plusDays(1).atStartOfDay(timeZoneService.getSystemZoneId()) : null;
+        ZonedDateTime startOfDay = date != null ? date.atStartOfDay(ZoneId.systemDefault()) : null;
+        ZonedDateTime endOfDay = date != null ? date.plusDays(1).atStartOfDay(ZoneId.systemDefault()) : null;
         
         Page<Appointment> appointments;
         if (startOfDay != null && endOfDay != null) {
@@ -344,6 +345,54 @@ public class AppointmentServiceImpl implements AppointmentService {
     private String generateBookingReference() {
         return "APT" + System.currentTimeMillis() + "-" + 
                UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+    
+    /**
+     * Validates if a status transition is allowed based on the current status.
+     *
+     * @param currentStatus The current status of the appointment
+     * @param newStatus The new status to transition to
+     * @return true if the transition is valid, false otherwise
+     */
+    private boolean isValidStatusTransition(AppointmentStatus currentStatus, AppointmentStatus newStatus) {
+        // If status is not changing, it's always valid
+        if (currentStatus == newStatus) {
+            return true;
+        }
+        
+        // Define valid transitions
+        switch (currentStatus) {
+            case REQUESTED:
+                // Can transition to CONFIRMED, CANCELLED, or REJECTED
+                return newStatus == AppointmentStatus.CONFIRMED || 
+                       newStatus == AppointmentStatus.CANCELLED;
+                       
+            case BOOKED:
+            case CONFIRMED:
+                // Can transition to CANCELLED, CHECKED_IN, or NO_SHOW
+                return newStatus == AppointmentStatus.CANCELLED || 
+                       newStatus == AppointmentStatus.CHECKED_IN || 
+                       newStatus == AppointmentStatus.NO_SHOW;
+                       
+            case CHECKED_IN:
+                // Can transition to IN_PROGRESS or CANCELLED
+                return newStatus == AppointmentStatus.IN_PROGRESS || 
+                       newStatus == AppointmentStatus.CANCELLED;
+                       
+            case IN_PROGRESS:
+                // Can transition to COMPLETED or CANCELLED
+                return newStatus == AppointmentStatus.COMPLETED || 
+                       newStatus == AppointmentStatus.CANCELLED;
+                       
+            case COMPLETED:
+            case CANCELLED:
+            case NO_SHOW:
+                // Terminal states - no further transitions allowed
+                return false;
+                
+            default:
+                return false;
+        }
     }
     
     private AppointmentResponse convertToDto(Appointment appointment) {

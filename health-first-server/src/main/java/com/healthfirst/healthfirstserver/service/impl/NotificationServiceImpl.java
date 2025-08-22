@@ -20,8 +20,9 @@ import java.util.Map;
  */
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class NotificationServiceImpl implements NotificationService {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("EEE, MMM d, yyyy 'at' h:mm a");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy");
@@ -67,9 +68,9 @@ public class NotificationServiceImpl implements NotificationService {
                 "emails/appointment-confirmation",
                 emailModel
             );
-            log.info("Appointment confirmation sent for appointment: {}", appointment.getId());
+            log.info("Sending appointment confirmation email for appointment ID: {}", appointment.getId() != null ? appointment.getId().toString() : "null");
         } catch (Exception e) {
-            log.error("Failed to send appointment confirmation email for appointment: {}", appointment.getId(), e);
+            log.error("Error sending appointment confirmation email for appointment ID: {}", appointment.getId() != null ? appointment.getId().toString() : "null", e);
         }
     }
 
@@ -102,9 +103,9 @@ public class NotificationServiceImpl implements NotificationService {
                 "emails/appointment-cancelled",
                 emailModel
             );
-            log.info("Appointment cancellation notification sent for appointment: {}", appointment.getId());
+            log.info("Appointment cancellation notification sent for appointment ID: {}", appointment.getId() != null ? appointment.getId().toString() : "null");
         } catch (Exception e) {
-            log.error("Failed to send appointment cancellation email for appointment: {}", appointment.getId(), e);
+            log.error("Error sending appointment cancellation email for appointment ID: {}", appointment.getId() != null ? appointment.getId().toString() : "null", e);
         }
     }
 
@@ -143,9 +144,9 @@ public class NotificationServiceImpl implements NotificationService {
                 "emails/appointment-rescheduled",
                 emailModel
             );
-            log.info("Appointment rescheduled notification sent for appointment: {}", appointment.getId());
+            log.info("Appointment rescheduled notification sent for appointment ID: {}", appointment.getId() != null ? appointment.getId().toString() : "null");
         } catch (Exception e) {
-            log.error("Failed to send appointment rescheduled email for appointment: {}", appointment.getId(), e);
+            log.error("Error sending appointment rescheduled email for appointment ID: {}", appointment.getId() != null ? appointment.getId().toString() : "null", e);
         }
     }
 
@@ -184,10 +185,10 @@ public class NotificationServiceImpl implements NotificationService {
                     emailModel
                 );
                 
-                log.info("Appointment reminder sent for appointment: {}", appointment.getId());
+                log.info("Appointment reminder sent for appointment: {}", appointment.getId() != null ? appointment.getId().toString() : "null");
             }
         } catch (Exception e) {
-            log.error("Failed to send appointment reminder email for appointment: {}", appointment.getId(), e);
+            log.error("Failed to send appointment reminder email for appointment: {}", appointment.getId() != null ? appointment.getId().toString() : "null", e);
         }
     }
 
@@ -221,9 +222,9 @@ public class NotificationServiceImpl implements NotificationService {
                 "emails/appointment-status-update",
                 emailModel
             );
-            log.info("Appointment status update sent for appointment: {}", appointment.getId());
+            log.info("Appointment status update sent for appointment: {}", appointment.getId() != null ? appointment.getId().toString() : "null");
         } catch (Exception e) {
-            log.error("Failed to send appointment status update email for appointment: {}", appointment.getId(), e);
+            log.error("Failed to send appointment status update email for appointment: {}", appointment.getId() != null ? appointment.getId().toString() : "null", e);
         }
     }
 
@@ -255,9 +256,9 @@ public class NotificationServiceImpl implements NotificationService {
                 "emails/provider-patient-checked-in",
                 emailModel
             );
-            log.info("Patient checked in notification sent for appointment: {}", appointment.getId());
+            log.info("Patient checked in notification sent for appointment: {}", appointment.getId() != null ? appointment.getId().toString() : "null");
         } catch (Exception e) {
-            log.error("Failed to send patient checked-in email for appointment: {}", appointment.getId(), e);
+            log.error("Failed to send patient checked-in email for appointment: {}", appointment.getId() != null ? appointment.getId().toString() : "null", e);
         }
     }
 
@@ -287,9 +288,9 @@ public class NotificationServiceImpl implements NotificationService {
                 "emails/appointment-completed",
                 emailModel
             );
-            log.info("Appointment completed notification sent for appointment: {}", appointment.getId());
+            log.info("Appointment completed notification sent for appointment: {}", appointment.getId() != null ? appointment.getId().toString() : "null");
         } catch (Exception e) {
-            log.error("Failed to send appointment completed email for appointment: {}", appointment.getId(), e);
+            log.error("Failed to send appointment completed email for appointment: {}", appointment.getId() != null ? appointment.getId().toString() : "null", e);
         }
     }
 
@@ -303,7 +304,6 @@ public class NotificationServiceImpl implements NotificationService {
         emailModel.put("providerName", providerName);
         emailModel.put("startTime", startTime);
         emailModel.put("endTime", endTime);
-        emailModel.put("baseUrl", baseUrl);
         
         // Send email
         try {
@@ -319,7 +319,7 @@ public class NotificationServiceImpl implements NotificationService {
             log.error("Failed to send new availability notification to provider: {}", providerEmail, e);
         }
     }
-
+    
     @Async
     @Override
     public void sendAvailabilityUpdatedNotification(String providerName, String providerEmail, 
@@ -400,11 +400,46 @@ public class NotificationServiceImpl implements NotificationService {
         return "Location not specified";
     }
     
-    /**
-     * Gets a user-friendly status message for the given appointment status
-     * @param status The appointment status
-     * @return A user-friendly status message
+    /**friendly status message
      */
+    @Async
+    @Override
+    public void sendAppointmentStarted(Appointment appointment) {
+        String patientName = appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName();
+        String providerName = appointment.getProvider().getFirstName() + " " + appointment.getProvider().getLastName();
+        String date = appointment.getStartTime().format(DATE_FORMATTER);
+        String time = appointment.getStartTime().format(TIME_FORMATTER);
+        String location = formatLocation(appointment);
+        
+        // Email content
+        String subject = "Appointment Started: " + appointment.getAppointmentType();
+        Map<String, Object> emailModel = new HashMap<>();
+        emailModel.put("patientName", patientName);
+        emailModel.put("providerName", providerName);
+        emailModel.put("appointmentType", appointment.getAppointmentType());
+        emailModel.put("date", date);
+        emailModel.put("time", time);
+        emailModel.put("location", location);
+        emailModel.put("notes", appointment.getNotes());
+        emailModel.put("baseUrl", baseUrl);
+        
+        try {
+            // Send email to patient
+            emailService.sendTemplatedEmail(
+                appointment.getPatient().getEmail(),
+                fromEmail,
+                subject,
+                "email/appointment-started",
+                emailModel
+            );
+            
+            log.info("Appointment started notification sent to patient: {}, appointment ID: {}", appointment.getPatient().getEmail(), appointment.getId() != null ? appointment.getId().toString() : "null");
+            
+        } catch (Exception e) {
+            log.error("Failed to send appointment started notification for appointment {}", appointment.getId() != null ? appointment.getId().toString() : "null", e);
+        }
+    }
+    
     private String getStatusMessage(AppointmentStatus status) {
         if (status == null) {
             return "Status not available";
